@@ -20,7 +20,7 @@ const App = () => {
   const [isBreak, setIsBreak] = useState(false);
   const [sessionDuration, setSessionDuration] = useState(25 * 60);
   const [breakDuration, setBreakDuration] = useState(5 * 60);
-  const [showSettings, setShowSettings] = useState(false);
+  //const [showSettings, setShowSettings] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [isDaytime, setIsDaytime] = useState(true);
 
