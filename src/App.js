@@ -13,6 +13,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./components/ui/dialog";
+import LandingPage from './components/LandingPage';
+import { Switch } from './components/ui/switch';
 
 const App = () => {
   const [timeLeft, setTimeLeft] = useState(25 * 60);
@@ -23,6 +25,10 @@ const App = () => {
   //const [showSettings, setShowSettings] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [isDaytime, setIsDaytime] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showLandingPage, setShowLandingPage] = useState(true);
+  const [notifications, setNotifications] = useState(true);
+  const [soundEnabled, setSoundEnabled] = useState(true);
 
   // Check if it's daytime (between 6 AM and 6 PM)
   useEffect(() => {
@@ -96,6 +102,16 @@ const App = () => {
     if (isBreak && !isRunning) setTimeLeft(duration);
   };
 
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
+  // Modify the theme logic to properly handle dark mode
+  const theme = isDarkMode ? 'night-bg' : (isDaytime ? 'day-bg' : 'night-bg');
+  
+  // Determine which background to show based on both isDarkMode and isDaytime
+  const shouldShowNightBackground = isDarkMode || !isDaytime;
+
   // Dynamic background elements
   const DayBackground = () => (
     <div className="absolute inset-0 overflow-hidden">
@@ -104,8 +120,10 @@ const App = () => {
       </div>
       <div className="cloud cloud1" />
       <div className="cloud cloud2" />
+      <div className="cloud cloud3" />
       <div className="mountain mountain1" />
       <div className="mountain mountain2" />
+      <div className="mountain mountain3" />
       <div className="ground" />
     </div>
   );
@@ -113,117 +131,146 @@ const App = () => {
   const NightBackground = () => (
     <div className="absolute inset-0 overflow-hidden">
       <div className="stars" />
-      <div className="moon" />
+      <div className="shooting-star" />
+      <div className="moon">
+        <div className="moon-craters" />
+      </div>
       <div className="cloud cloud1" />
-      <div className="mountain mountain1" />
-      <div className="mountain mountain2" />
+      <div className="cloud cloud2" />
+      <div className="cloud cloud3" />
+      <div className="mountain mountain1 night-mountain" />
+      <div className="mountain mountain2 night-mountain" />
+      <div className="mountain mountain3 night-mountain" />
       <div className="ground night" />
     </div>
   );
 
   return (
-    <div className={`flex justify-center items-center min-h-screen relative ${isDaytime ? 'day-bg' : 'night-bg'}`}>
-      {isDaytime ? <DayBackground /> : <NightBackground />}
-      
-      <Card className={`w-96 ${isDaytime ? 'bg-white/90' : 'bg-gray-900/90'} backdrop-blur-lg`}>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle className={isDaytime ? 'text-gray-900' : 'text-white'}>
-              Pomodoro Timer
-            </CardTitle>
-            <div className="flex gap-2">
-              {isDaytime ? 
-                <Sun className="h-5 w-5 text-yellow-500" /> : 
-                <Moon className="h-5 w-5 text-blue-300" />
-              }
-              <Dialog>
-                <DialogTrigger>
-                  <Settings className={`h-5 w-5 ${isDaytime ? 'text-gray-500 hover:text-gray-700' : 'text-gray-400 hover:text-gray-200'} cursor-pointer`} />
-                </DialogTrigger>
-                <DialogContent className={isDaytime ? 'bg-white' : 'bg-gray-900 border-gray-800'}>
-                  <DialogHeader>
-                    <DialogTitle className={isDaytime ? 'text-gray-900' : 'text-white'}>
-                      Timer Settings
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-6 py-4">
-                    <div>
-                      <label className={`text-sm font-medium ${isDaytime ? 'text-gray-900' : 'text-white'}`}>
-                        Work Duration (minutes): {sessionDuration / 60}
-                      </label>
-                      <Slider
-                        defaultValue={[sessionDuration / 60]}
-                        max={60}
-                        min={1}
-                        step={1}
-                        onValueChange={updateSessionDuration}
-                      />
-                    </div>
-                    <div>
-                      <label className={`text-sm font-medium ${isDaytime ? 'text-gray-900' : 'text-white'}`}>
-                        Break Duration (minutes): {breakDuration / 60}
-                      </label>
-                      <Slider
-                        defaultValue={[breakDuration / 60]}
-                        max={15}
-                        min={1}
-                        step={1}
-                        onValueChange={updateBreakDuration}
-                      />
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center space-y-6">
-            <div>
-              <h2 className={`text-xl ${isDaytime ? 'text-gray-700' : 'text-gray-300'} mb-2`}>
-                {isBreak ? "Break Time!" : "Work Time!"}
-              </h2>
-              <div className={`text-6xl font-mono ${isDaytime ? 'text-gray-900' : 'text-white'}`}>
-                {formatTime(timeLeft)}
+    <>
+      {showLandingPage ? (
+        <LandingPage 
+          onStart={() => setShowLandingPage(false)} 
+          isDaytime={!shouldShowNightBackground}
+          isDarkMode={isDarkMode}
+        />
+      ) : (
+        <div className={`flex justify-center items-center min-h-screen relative ${theme}`}>
+          {shouldShowNightBackground ? <NightBackground /> : <DayBackground />}
+          
+          <Card className={`w-96 ${shouldShowNightBackground ? 'bg-gray-900/90' : 'bg-white/90'} backdrop-blur-lg`}>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <CardTitle className={shouldShowNightBackground ? 'text-gray-300' : 'text-gray-900'}>
+                  Pomodoro Timer
+                </CardTitle>
+                <div className="flex gap-2">
+                  <button
+                    onClick={toggleTheme}
+                    className="p-2 rounded-full hover:bg-gray-800 dark:hover:bg-gray-100"
+                  >
+                    {isDarkMode ? 
+                      <Sun className="h-5 w-5 text-yellow-500" /> : 
+                      <Moon className="h-5 w-5 text-blue-300" />
+                    }
+                  </button>
+                  <Dialog>
+                    <DialogTrigger>
+                      <Settings className={`h-5 w-5 ${shouldShowNightBackground ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'} cursor-pointer`} />
+                    </DialogTrigger>
+                    <DialogContent className={shouldShowNightBackground ? 'bg-gray-800 border-gray-700' : 'bg-white'}>
+                      <DialogHeader>
+                        <DialogTitle className={shouldShowNightBackground ? 'text-gray-300' : 'text-gray-900'}>
+                          Timer Settings
+                        </DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-6 py-4">
+                        <div>
+                          <label className={`text-sm font-medium ${shouldShowNightBackground ? 'text-gray-300' : 'text-gray-900'}`}>
+                            Work Duration (minutes): {sessionDuration / 60}
+                          </label>
+                          <Slider
+                            defaultValue={[sessionDuration / 60]}
+                            max={60}
+                            min={1}
+                            step={1}
+                            onValueChange={updateSessionDuration}
+                          />
+                        </div>
+                        <div>
+                          <label className={`text-sm font-medium ${shouldShowNightBackground ? 'text-gray-300' : 'text-gray-900'}`}>
+                            Break Duration (minutes): {breakDuration / 60}
+                          </label>
+                          <Slider
+                            defaultValue={[breakDuration / 60]}
+                            max={15}
+                            min={1}
+                            step={1}
+                            onValueChange={updateBreakDuration}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <label>Notifications</label>
+                          <Switch checked={notifications} onCheckedChange={setNotifications} />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <label>Sound</label>
+                          <Switch checked={soundEnabled} onCheckedChange={setSoundEnabled} />
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </div>
-            </div>
-            <div className="flex justify-center space-x-4">
-              <button
-                onClick={toggleTimer}
-                className={`inline-flex items-center px-4 py-2 rounded-lg focus:outline-none focus:ring-2 ${
-                  isDaytime 
-                    ? 'bg-blue-500 hover:bg-blue-600 focus:ring-blue-500' 
-                    : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-400'
-                } text-white`}
-              >
-                {isRunning ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-                <span className="ml-2">{isRunning ? "Pause" : "Start"}</span>
-              </button>
-              <button
-                onClick={resetTimer}
-                className={`inline-flex items-center px-4 py-2 rounded-lg focus:outline-none focus:ring-2 ${
-                  isDaytime 
-                    ? 'bg-gray-500 hover:bg-gray-600 focus:ring-gray-500' 
-                    : 'bg-gray-700 hover:bg-gray-800 focus:ring-gray-400'
-                } text-white`}
-              >
-                <RotateCcw className="h-5 w-5" />
-                <span className="ml-2">Reset</span>
-              </button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      {showNotification && (
-        <Alert className="fixed bottom-4 right-4 w-72">
-          <Bell className="h-4 w-4" />
-          <AlertDescription>
-            {isBreak ? "Break time is over!" : "Work session is over!"}
-          </AlertDescription>
-        </Alert>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center space-y-6">
+                <div>
+                  <h2 className={`text-xl ${shouldShowNightBackground ? 'text-gray-300' : 'text-gray-900'} mb-2`}>
+                    {isBreak ? "Break Time!" : "Work Time!"}
+                  </h2>
+                  <div className={`text-6xl font-mono ${shouldShowNightBackground ? 'text-gray-300' : 'text-gray-900'}`}>
+                    {formatTime(timeLeft)}
+                  </div>
+                </div>
+                <div className="flex justify-center space-x-4">
+                  <button
+                    onClick={toggleTimer}
+                    className={`inline-flex items-center px-4 py-2 rounded-lg focus:outline-none focus:ring-2 ${
+                      shouldShowNightBackground 
+                        ? 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-400'
+                        : 'bg-blue-500 hover:bg-blue-600 focus:ring-blue-500'
+                    } text-white`}
+                  >
+                    {isRunning ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+                    <span className="ml-2">{isRunning ? "Pause" : "Start"}</span>
+                  </button>
+                  <button
+                    onClick={resetTimer}
+                    className={`inline-flex items-center px-4 py-2 rounded-lg focus:outline-none focus:ring-2 ${
+                      shouldShowNightBackground 
+                        ? 'bg-gray-700 hover:bg-gray-800 focus:ring-gray-400'
+                        : 'bg-gray-500 hover:bg-gray-600 focus:ring-gray-500'
+                    } text-white`}
+                  >
+                    <RotateCcw className="h-5 w-5" />
+                    <span className="ml-2">Reset</span>
+                  </button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {showNotification && (
+            <Alert className="fixed bottom-4 right-4 w-72">
+              <Bell className="h-4 w-4" />
+              <AlertDescription>
+                {isBreak ? "Break time is over!" : "Work session is over!"}
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
       )}
-    </div>
+    </>
   );
 };
 

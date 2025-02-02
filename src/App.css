@@ -54,22 +54,44 @@
   animation: twinkle 4s infinite;
 }
 
-/* Mountains */
+/* Mountains container */
+.mountains {
+  position: absolute;
+  bottom: 70px;
+  width: 100%;
+  height: 300px;
+}
+
+/* Mountain styles */
 .mountain {
   position: absolute;
-  bottom: 0;
-  border-left: 150px solid transparent;
-  border-right: 150px solid transparent;
+  bottom: 70px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.2));
 }
 
 .mountain1 {
   left: 0;
-  border-bottom: 200px solid #2d3748;
+  border-width: 0 150px 200px 150px;
+  border-color: transparent transparent #4B5563 transparent;
 }
 
 .mountain2 {
-  right: 0;
-  border-bottom: 300px solid #1a202c;
+  left: 200px;
+  border-width: 0 200px 300px 200px;
+  border-color: transparent transparent #374151 transparent;
+}
+
+.mountain3 {
+  right: 100px;
+  border-width: 0 175px 250px 175px;
+  border-color: transparent transparent #4B5563 transparent;
+}
+
+.night-mountain {
+  border-color: transparent transparent #1F2937 transparent;
 }
 
 /* Ground */
@@ -90,23 +112,156 @@
 .cloud {
   position: absolute;
   background: white;
-  border-radius: 100px;
-  animation: float 20s infinite linear;
+  border-radius: 50px;
+  animation: float linear infinite;
+}
+
+.cloud::before,
+.cloud::after {
+  content: '';
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+}
+
+.cloud::before {
+  width: 50px;
+  height: 50px;
+  top: -20px;
+  left: 10px;
+}
+
+.cloud::after {
+  width: 30px;
+  height: 30px;
+  top: -10px;
+  right: 10px;
 }
 
 .cloud1 {
-  top: 20%;
-  left: -100px;
-  width: 100px;
+  width: 120px;
   height: 40px;
+  top: 15%;
+  animation-duration: 35s;
 }
 
 .cloud2 {
-  top: 30%;
-  left: -150px;
-  width: 150px;
-  height: 50px;
+  width: 120px;
+  height: 40px;
+  top: 25%;
+  animation-duration: 45s;
+  animation-delay: -15s;
+}
+
+.cloud3 {
+  width: 120px;
+  height: 40px;
+  top: 20%;
+  animation-duration: 40s;
+  animation-delay: -25s;
+}
+
+@keyframes float {
+  from { 
+    transform: translateX(-200px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.8;
+  }
+  to { 
+    transform: translateX(calc(100vw + 200px));
+    opacity: 0;
+  }
+}
+
+/* Night mode clouds */
+.night .cloud,
+.night .cloud::before,
+.night .cloud::after {
+  background: rgba(74, 85, 104, 0.4);
+  filter: brightness(0.7);
+}
+
+/* Birds */
+.birds {
+  position: absolute;
+  top: 15%;
+  left: 0;
+  right: 0;
+  height: 100px;
+}
+
+.birds::before,
+.birds::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: 
+    linear-gradient(45deg, transparent 50%, #2D3748 50%),
+    linear-gradient(-45deg, transparent 50%, #2D3748 50%);
+  background-size: 20px 20px;
+  animation: birdFly 20s linear infinite;
+}
+
+.birds::after {
+  top: 40px;
   animation-delay: -10s;
+}
+
+/* Shooting Star */
+.shooting-star {
+  position: absolute;
+  top: 20%;
+  left: 80%;
+  width: 100px;
+  height: 2px;
+  background: linear-gradient(90deg, white, transparent);
+  animation: shootingStar 10s linear infinite;
+  opacity: 0;
+}
+
+/* Enhanced Sun Rays */
+.sun-rays {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 160px;
+  height: 160px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, transparent 40%, rgba(255, 215, 0, 0.2) 70%);
+  animation: rotate 20s linear infinite;
+}
+
+/* Trees */
+.trees {
+  position: absolute;
+  bottom: 70px;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: repeating-linear-gradient(
+    transparent 0,
+    transparent 20px,
+    #2D3748 20px,
+    #2D3748 40px
+  );
+  mask-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0 L100 100 L0 100 Z' fill='black'/%3E%3C/svg%3E");
+  mask-size: 50px 50px;
+  mask-repeat: repeat-x;
+}
+
+.night-trees {
+  background: repeating-linear-gradient(
+    transparent 0,
+    transparent 20px,
+    #1A202C 20px,
+    #1A202C 40px
+  );
 }
 
 /* Animations */
@@ -121,9 +276,15 @@
   100% { opacity: 0.8; }
 }
 
-@keyframes float {
-  from { transform: translateX(-100px); }
-  to { transform: translateX(calc(100vw + 100px)); }
+@keyframes birdFly {
+  from { transform: translateX(-100%) translateY(0px); }
+  to { transform: translateX(100vw) translateY(-50px); }
+}
+
+@keyframes shootingStar {
+  0% { transform: translateX(0) translateY(0) rotate(-45deg); opacity: 1; }
+  20% { transform: translateX(-100px) translateY(100px) rotate(-45deg); opacity: 0; }
+  100% { transform: translateX(-100px) translateY(100px) rotate(-45deg); opacity: 0; }
 }
 
 /* Existing styles remain... */
@@ -246,68 +407,10 @@
   }
 }
 
-/* Shooting stars */
-.shooting-star {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: white;
-  animation: shoot 10s linear infinite;
-}
-
-@keyframes shoot {
-  0% {
-    transform: translateX(0) translateY(0) rotate(45deg);
-    opacity: 0;
-  }
-  5% {
-    opacity: 1;
-  }
-  10% {
-    transform: translateX(100px) translateY(100px) rotate(45deg);
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(100px) translateY(100px) rotate(45deg);
-    opacity: 0;
-  }
-}
-
 /* Enhanced rotate animation */
 @keyframes rotate {
   from { transform: translate(-50%, -50%) rotate(0deg); }
   to { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-/* Cloud animations */
-.cloud {
-  position: absolute;
-  background: white;
-  border-radius: 100px;
-  animation: float 20s infinite linear;
-  opacity: 0.8;
-}
-
-.cloud::before,
-.cloud::after {
-  content: '';
-  position: absolute;
-  background: white;
-  border-radius: 50%;
-}
-
-.cloud::before {
-  width: 50px;
-  height: 50px;
-  top: -20px;
-  left: 10px;
-}
-
-.cloud::after {
-  width: 30px;
-  height: 30px;
-  top: -10px;
-  right: 10px;
 }
 
 /* Transition animations */
@@ -319,4 +422,123 @@
 @keyframes fadeOut {
   from { opacity: 1; }
   to { opacity: 0; }
+}
+
+.feature-card {
+  transition: transform 0.2s;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+}
+
+.hero-text {
+  animation: fadeIn 1s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .mountain1 {
+    left: -50px;
+    border-width: 0 100px 150px 100px;
+  }
+
+  .mountain2 {
+    left: 100px;
+    border-width: 0 150px 200px 150px;
+  }
+
+  .mountain3 {
+    right: -50px;
+    border-width: 0 125px 175px 125px;
+  }
+
+  .sun {
+    width: 60px;
+    height: 60px;
+  }
+
+  .moon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .cloud {
+    transform: scale(0.7);
+  }
+
+  .cloud1 {
+    top: 10%;
+  }
+
+  .cloud2 {
+    top: 20%;
+  }
+
+  .cloud3 {
+    top: 15%;
+  }
+}
+
+/* Card responsive styles */
+.card {
+  width: 90%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  .card {
+    width: 95%;
+    padding: 1rem;
+  }
+}
+
+/* Button responsive styles */
+@media (max-width: 640px) {
+  button {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Text responsive styles */
+@media (max-width: 640px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+  
+  p {
+    font-size: 0.875rem;
+  }
+}
+
+/* Layout responsive adjustments */
+@media (max-width: 640px) {
+  .min-h-screen {
+    padding: 1rem;
+  }
+}
+
+/* Add smooth transitions */
+.transition-all {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Add hover effects to buttons */
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Add progress indicator */
+.progress-ring {
+  transition: stroke-dashoffset 0.35s;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
 }
