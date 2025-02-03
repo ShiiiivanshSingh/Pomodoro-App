@@ -302,7 +302,7 @@ const App = () => {
           {shouldShowNightBackground ? <MemoizedNightBackground /> : <MemoizedDayBackground />}
           
           {/* Updated Time Display with custom message */}
-          <div className={`absolute top-4 left-2 right-2 md:left-1/2 md:right-auto md:transform md:-translate-x-1/2 flex flex-col md:flex-row items-center gap-1 md:gap-2 px-3 py-2 md:px-4 rounded-lg md:rounded-full ${
+          <div className={`absolute top-4 left-2 right-14 md:left-1/2 md:right-auto md:transform md:-translate-x-1/2 flex flex-col md:flex-row items-center gap-1 md:gap-2 px-3 py-2 md:px-4 rounded-lg md:rounded-full ${
             isDarkMode ? 'bg-gray-800/80 text-gray-200' : 'bg-white/80 text-gray-800'
           } backdrop-blur-sm text-xs md:text-base`}>
             <Clock className="h-4 w-4 hidden md:block" />
@@ -310,6 +310,19 @@ const App = () => {
               {formatTimeDisplay(currentTime)} - {getTimeMessage(currentTime.getHours())}
             </div>
           </div>
+
+          {/* About Button */}
+          <button
+            onClick={() => setShowAbout(true)}
+            className={`absolute top-4 right-2 p-2 rounded-full backdrop-blur-lg z-20 ${
+              shouldShowNightBackground 
+                ? 'bg-gray-900/90 text-gray-200 hover:bg-gray-800/90' 
+                : 'bg-white/90 text-gray-800 hover:bg-gray-50/90'
+            }`}
+            aria-label="About FocusBuddy"
+          >
+            <Info className="h-5 w-5" />
+          </button>
 
           <Card className={`w-[90%] max-w-sm md:w-96 mx-4 ${shouldShowNightBackground ? 'bg-gray-900/90' : 'bg-white/90'} backdrop-blur-lg`}>
             <CardHeader>
@@ -327,15 +340,6 @@ const App = () => {
                       <Sun className="h-5 w-5 text-yellow-500" /> : 
                       <Moon className="h-5 w-5 text-blue-300" />
                     }
-                  </button>
-                  <button
-                    onClick={() => setShowAbout(true)}
-                    className="p-2 rounded-full hover:bg-gray-800 dark:hover:bg-gray-100"
-                    aria-label="About FocusBuddy"
-                  >
-                    <Info className={`h-5 w-5 ${
-                      shouldShowNightBackground ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'
-                    }`} />
                   </button>
                   <Dialog>
                     <DialogTrigger>
