@@ -442,7 +442,7 @@ const App = () => {
                 shouldShowNightBackground ? 'text-blue-400' : 'text-blue-600'
               }`} />
               <AlertDescription className="font-medium">
-                {isBreak ? "Break time is over!" : "Work session is over!"}
+                {isBreak ? "Break time has started!" : "Work session has started!"}
               </AlertDescription>
             </Alert>
           )}
