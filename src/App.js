@@ -1,8 +1,8 @@
 import './App.css';
 import './index.css';
 
-import React, { useState, useEffect } from 'react';
-import { Bell, Pause, Play, RotateCcw, Settings, Sun, Moon } from 'lucide-react';
+import React, { useState, useEffect, memo } from 'react';
+import { Bell, Pause, Play, RotateCcw, Settings, Sun, Moon, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Slider } from './components/ui/slider';
 import { Alert, AlertDescription } from './components/ui/alert';
@@ -15,6 +15,39 @@ import {
 } from "./components/ui/dialog";
 import LandingPage from './components/LandingPage';
 import { Switch } from './components/ui/switch';
+
+// Memoize the background components to prevent re-renders
+const MemoizedDayBackground = memo(() => (
+  <div className="absolute inset-0 overflow-hidden">
+    <div className="sun-animation">
+      <div className="sun" />
+    </div>
+    <div className="cloud cloud1" />
+    <div className="cloud cloud2" />
+    <div className="cloud cloud3" />
+    <div className="mountain mountain1" />
+    <div className="mountain mountain2" />
+    <div className="mountain mountain3" />
+    <div className="ground" />
+  </div>
+));
+
+const MemoizedNightBackground = memo(() => (
+  <div className="absolute inset-0 overflow-hidden">
+    <div className="stars" />
+    <div className="shooting-star" />
+    <div className="moon">
+      <div className="moon-craters" />
+    </div>
+    <div className="cloud cloud1" />
+    <div className="cloud cloud2" />
+    <div className="cloud cloud3" />
+    <div className="mountain mountain1 night-mountain" />
+    <div className="mountain mountain2 night-mountain" />
+    <div className="mountain mountain3 night-mountain" />
+    <div className="ground night" />
+  </div>
+));
 
 const App = () => {
   const [timeLeft, setTimeLeft] = useState(25 * 60);
@@ -29,21 +62,9 @@ const App = () => {
   const [showLandingPage, setShowLandingPage] = useState(true);
   const [notifications, setNotifications] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Check if it's daytime (between 6 AM and 6 PM)
-  useEffect(() => {
-    const checkDayTime = () => {
-      const hour = new Date().getHours();
-      setIsDaytime(hour >= 6 && hour < 18); //for test only night-> setIsDaytime(hour >= 18 && hour < 6);
-    };
-    
-    checkDayTime(); // Initial check
-    const interval = setInterval(checkDayTime, 60000); // Check every minute
-    
-    return () => clearInterval(interval);
-  }, []);
-
-  // Timer logic
+  // Move timer logic into a separate useEffect
   useEffect(() => {
     let interval = null;
     if (isRunning) {
@@ -65,7 +86,23 @@ const App = () => {
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [isRunning, timeLeft, isBreak, sessionDuration, breakDuration]);
+  }, [isRunning, isBreak, sessionDuration, breakDuration]);
+
+  // Add time check and update effect
+  useEffect(() => {
+    const checkTimeAndUpdate = () => {
+      const now = new Date();
+      setCurrentTime(now);
+      const hour = now.getHours();
+      // Set dark mode if time is between 6 PM (18) and 6 AM
+      setIsDarkMode(hour >= 18 || hour < 6);
+    };
+    
+    checkTimeAndUpdate(); // Initial check
+    const interval = setInterval(checkTimeAndUpdate, 60000); // Update every minute
+    
+    return () => clearInterval(interval);
+  }, []);
 
   const toggleTimer = () => setIsRunning(!isRunning);
   const resetTimer = () => {
@@ -104,46 +141,43 @@ const App = () => {
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
+    setIsDaytime(!isDaytime);
   };
 
-  // Modify the theme logic to properly handle dark mode
-  const theme = isDarkMode ? 'night-bg' : (isDaytime ? 'day-bg' : 'night-bg');
+  // Modify the theme logic to use only isDarkMode
+  const theme = isDarkMode ? 'night-bg' : 'day-bg';
   
-  // Determine which background to show based on both isDarkMode and isDaytime
-  const shouldShowNightBackground = isDarkMode || !isDaytime;
+  // Use only isDarkMode to determine background
+  const shouldShowNightBackground = isDarkMode;
 
-  // Dynamic background elements
-  const DayBackground = () => (
-    <div className="absolute inset-0 overflow-hidden">
-      <div className="sun-animation">
-        <div className="sun" />
-      </div>
-      <div className="cloud cloud1" />
-      <div className="cloud cloud2" />
-      <div className="cloud cloud3" />
-      <div className="mountain mountain1" />
-      <div className="mountain mountain2" />
-      <div className="mountain mountain3" />
-      <div className="ground" />
-    </div>
-  );
+  // Format time for display
+  const formatTimeDisplay = (date) => {
+    return date.toLocaleTimeString('en-US', { 
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true 
+    });
+  };
 
-  const NightBackground = () => (
-    <div className="absolute inset-0 overflow-hidden">
-      <div className="stars" />
-      <div className="shooting-star" />
-      <div className="moon">
-        <div className="moon-craters" />
-      </div>
-      <div className="cloud cloud1" />
-      <div className="cloud cloud2" />
-      <div className="cloud cloud3" />
-      <div className="mountain mountain1 night-mountain" />
-      <div className="mountain mountain2 night-mountain" />
-      <div className="mountain mountain3 night-mountain" />
-      <div className="ground night" />
-    </div>
-  );
+  // Add function to get custom message based on hour
+  const getTimeMessage = (hour) => {
+    if (hour >= 5 && hour < 12) {
+      return "Good morning! Perfect time for deep focus.";
+    } else if (hour >= 12 && hour < 15) {
+      return "Good afternoon! Keep up the momentum.";
+    } else if (hour >= 15 && hour < 17) {
+      return "Mid-afternoon! Push through with focus.";
+    } else if (hour >= 17 && hour < 20) {
+      return "Early evening! Make the most of remaining daylight.";
+    } else if (hour >= 20 && hour < 23) {
+      return "Evening time! Wind down with focused work.";
+    } else if (hour >= 23 || hour < 1) {
+      return "Late night! Consider resting soon.";
+    } else if (hour >= 1 && hour < 5) {
+      return "It's very late! Make sure to rest well.";
+    }
+    return "Stay focused!";
+  };
 
   return (
     <>
@@ -155,8 +189,18 @@ const App = () => {
         />
       ) : (
         <div className={`flex justify-center items-center min-h-screen relative ${theme}`}>
-          {shouldShowNightBackground ? <NightBackground /> : <DayBackground />}
+          {shouldShowNightBackground ? <MemoizedNightBackground /> : <MemoizedDayBackground />}
           
+          {/* Updated Time Display with custom message */}
+          <div className={`absolute top-4 left-1/2 transform -translate-x-1/2 flex items-center gap-2 px-4 py-2 rounded-full ${
+            isDarkMode ? 'bg-gray-800/80 text-gray-200' : 'bg-white/80 text-gray-800'
+          } backdrop-blur-sm`}>
+            <Clock className="h-4 w-4" />
+            <span className="font-medium">
+              {formatTimeDisplay(currentTime)} - {getTimeMessage(currentTime.getHours())}
+            </span>
+          </div>
+
           <Card className={`w-96 ${shouldShowNightBackground ? 'bg-gray-900/90' : 'bg-white/90'} backdrop-blur-lg`}>
             <CardHeader>
               <div className="flex justify-between items-center">
@@ -167,6 +211,7 @@ const App = () => {
                   <button
                     onClick={toggleTheme}
                     className="p-2 rounded-full hover:bg-gray-800 dark:hover:bg-gray-100"
+                    aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
                   >
                     {isDarkMode ? 
                       <Sun className="h-5 w-5 text-yellow-500" /> : 

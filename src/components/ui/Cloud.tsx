@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useEffect, useRef } from "react";
 import { cn } from "../../lib/utils";
 
 interface CloudProps {
@@ -7,23 +8,52 @@ interface CloudProps {
 }
 
 const Cloud: React.FC<CloudProps> = ({ className, startPosition }) => {
-  const [position, setPosition] = React.useState(startPosition);
+  const cloudRef = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<number | undefined>(undefined);
+  const positionRef = useRef<number>(startPosition);
+  const speedRef = useRef<number>(Math.random() * 0.3 + 0.2); // Random speed between 0.2 and 0.5
 
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setPosition((prev) => (prev >= 100 ? -10 : prev + 0.1)); // Move cloud to the right
-    }, 100); // Update position every 100ms
+  useEffect(() => {
+    let lastTime = performance.now();
+    
+    const animate = (currentTime: number) => {
+      const deltaTime = currentTime - lastTime;
+      lastTime = currentTime;
 
-    return () => clearInterval(interval); // Cleanup on unmount
+      if (cloudRef.current) {
+        positionRef.current -= speedRef.current * deltaTime * 0.1;
+        
+        // Reset position when cloud moves off screen
+        if (positionRef.current < -200) {
+          positionRef.current = window.innerWidth + 100;
+        }
+
+        cloudRef.current.style.transform = `translateX(${positionRef.current}px)`;
+      }
+
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
   }, []);
 
-  const cloudStyle: React.CSSProperties = {
-    position: 'absolute',
-    left: `${position}vw`, // Use the updated position
-    top: `${Math.random() * 50}vh`, // Random height
-  };
-
-  return <div className={`cloud ${className}`} style={cloudStyle} />;
+  return (
+    <div 
+      ref={cloudRef}
+      className={`cloud ${className}`}
+      style={{ 
+        position: 'absolute',
+        willChange: 'transform',
+        transform: `translateX(${startPosition}px)`
+      }}
+    />
+  );
 };
 
 export default Cloud; 
