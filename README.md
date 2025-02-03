@@ -5,7 +5,7 @@ A modern, minimalist focus timer application designed to boost your productivity
 
 <div align="center">
 
-[![FocusBuddy](https://img.shields.io/badge/Meet_Your-FocusBuddy-blue?style=for-the-badge)](https://your-deployment-url-here)
+[![FocusBuddy](https://img.shields.io/badge/Meet_Your-FocusBuddy-blue?style=for-the-badge)](https://pomodoro-app-ten-kappa.vercel.app)
 </div>
 
 
@@ -37,8 +37,10 @@ A modern, minimalist focus timer application designed to boost your productivity
 
 <h1 align="center">☁️ Project Screenshots:</h1>
 
-![image](https://github.com/user-attachments/assets/70ab5a4f-dd70-464a-9897-0688de57526b)
-![image](https://github.com/user-attachments/assets/956a21cb-fc18-4784-aa7a-f19f27787619)
+![Screenshot 2025-02-03 204753](https://github.com/user-attachments/assets/a171e3f6-aef8-4f16-8040-393383a2dbcf)
+![Screenshot 2025-02-03 204809](https://github.com/user-attachments/assets/27c4d004-8a0a-435a-b73a-484198299085)
+
+
 
 
 ### Keyboard Shortcuts
