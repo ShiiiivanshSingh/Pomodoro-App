@@ -270,7 +270,7 @@ const App = () => {
                 <h2 className="text-xl font-bold mb-4">📦 Open Source</h2>
                 <p className="text-sm mb-4">This project is open source! Feel free to contribute or star the repository.</p>
                 <a 
-                  href="https://github.com/ShiiiivanshSingh/FocusBuddy" 
+                  href="https://github.com/ShiiiivanshSingh/Pomodoro-App" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className={`inline-flex items-center px-4 py-2 rounded-lg text-sm ${
