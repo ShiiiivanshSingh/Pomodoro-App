@@ -122,7 +122,7 @@ const App = () => {
 
   const showAlert = () => {
     setShowNotification(true);
-    setTimeout(() => setShowNotification(false), 3000);
+    setTimeout(() => setShowNotification(false), 10000); // Show for 10 seconds
   };
 
   const updateSessionDuration = (newValue) => {
@@ -270,7 +270,7 @@ const App = () => {
                 <h2 className="text-xl font-bold mb-4">📦 Open Source</h2>
                 <p className="text-sm mb-4">This project is open source! Feel free to contribute or star the repository.</p>
                 <a 
-                  href="https://github.com/ShiiiivanshSingh/Pomodoro-App" 
+                  href="https://github.com/ShiiiivanshSingh/FocusBuddy" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className={`inline-flex items-center px-4 py-2 rounded-lg text-sm ${
@@ -433,9 +433,15 @@ const App = () => {
           </Card>
           
           {showNotification && (
-            <Alert className="fixed bottom-4 right-4 w-72">
-              <Bell className="h-4 w-4" />
-              <AlertDescription>
+            <Alert className={`fixed bottom-4 right-4 w-72 backdrop-blur-lg ${
+              shouldShowNightBackground 
+                ? 'bg-gray-900/90 text-gray-200 border border-gray-700' 
+                : 'bg-white/90 text-gray-800 border border-gray-200'
+            } p-4 rounded-lg shadow-lg flex items-center gap-2`}>
+              <Bell className={`h-5 w-5 ${
+                shouldShowNightBackground ? 'text-blue-400' : 'text-blue-600'
+              }`} />
+              <AlertDescription className="font-medium">
                 {isBreak ? "Break time is over!" : "Work session is over!"}
               </AlertDescription>
             </Alert>
