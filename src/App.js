@@ -61,8 +61,8 @@ const App = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showLandingPage, setShowLandingPage] = useState(true);
   const [notifications, setNotifications] = useState(true);
-  const [soundEnabled, setSoundEnabled] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [completedSessions, setCompletedSessions] = useState(0);
 
   // Move timer logic into a separate useEffect
   useEffect(() => {
@@ -71,8 +71,10 @@ const App = () => {
       interval = setInterval(() => {
         setTimeLeft((prevTime) => {
           if (prevTime === 0) {
-            playAlertSound();
             showAlert();
+            if (!isBreak) {
+              setCompletedSessions(prev => prev + 1);
+            }
             if (isBreak) {
               setIsBreak(false);
               return sessionDuration;
@@ -115,11 +117,6 @@ const App = () => {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${minutes}:${secs < 10 ? '0' + secs : secs}`;
-  };
-
-  const playAlertSound = () => {
-    const audio = new Audio('data:audio/wav;base64,//uQRAAAA');
-    audio.play().catch(e => console.log('Audio play failed:', e));
   };
 
   const showAlert = () => {
@@ -179,6 +176,20 @@ const App = () => {
     return "Stay focused!";
   };
 
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        toggleTimer();
+      } else if (e.code === 'KeyR') {
+        resetTimer();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [toggleTimer, resetTimer]);
+
   return (
     <>
       {showLandingPage ? (
@@ -192,16 +203,16 @@ const App = () => {
           {shouldShowNightBackground ? <MemoizedNightBackground /> : <MemoizedDayBackground />}
           
           {/* Updated Time Display with custom message */}
-          <div className={`absolute top-4 left-1/2 transform -translate-x-1/2 flex items-center gap-2 px-4 py-2 rounded-full ${
+          <div className={`absolute top-4 left-2 right-2 md:left-1/2 md:right-auto md:transform md:-translate-x-1/2 flex flex-col md:flex-row items-center gap-1 md:gap-2 px-3 py-2 md:px-4 rounded-lg md:rounded-full ${
             isDarkMode ? 'bg-gray-800/80 text-gray-200' : 'bg-white/80 text-gray-800'
-          } backdrop-blur-sm`}>
-            <Clock className="h-4 w-4" />
-            <span className="font-medium">
+          } backdrop-blur-sm text-xs md:text-base`}>
+            <Clock className="h-4 w-4 hidden md:block" />
+            <div className="font-medium text-center w-full">
               {formatTimeDisplay(currentTime)} - {getTimeMessage(currentTime.getHours())}
-            </span>
+            </div>
           </div>
 
-          <Card className={`w-96 ${shouldShowNightBackground ? 'bg-gray-900/90' : 'bg-white/90'} backdrop-blur-lg`}>
+          <Card className={`w-[90%] max-w-sm md:w-96 mx-4 ${shouldShowNightBackground ? 'bg-gray-900/90' : 'bg-white/90'} backdrop-blur-lg`}>
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle className={shouldShowNightBackground ? 'text-gray-300' : 'text-gray-900'}>
@@ -254,12 +265,10 @@ const App = () => {
                           />
                         </div>
                         <div className="flex items-center justify-between">
-                          <label>Notifications</label>
+                          <label className={`${shouldShowNightBackground ? 'text-gray-300' : 'text-gray-900'}`}>
+                            Notifications
+                          </label>
                           <Switch checked={notifications} onCheckedChange={setNotifications} />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <label>Sound</label>
-                          <Switch checked={soundEnabled} onCheckedChange={setSoundEnabled} />
                         </div>
                       </div>
                     </DialogContent>
@@ -280,6 +289,7 @@ const App = () => {
                 <div className="flex justify-center space-x-4">
                   <button
                     onClick={toggleTimer}
+                    title="Space to Start/Pause"
                     className={`inline-flex items-center px-4 py-2 rounded-lg focus:outline-none focus:ring-2 ${
                       shouldShowNightBackground 
                         ? 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-400'
@@ -300,6 +310,11 @@ const App = () => {
                     <RotateCcw className="h-5 w-5" />
                     <span className="ml-2">Reset</span>
                   </button>
+                </div>
+                <div className="text-center mt-4">
+                  <span className={`text-sm ${shouldShowNightBackground ? 'text-gray-300' : 'text-gray-900'}`}>
+                    Sessions completed today: {completedSessions}
+                  </span>
                 </div>
               </div>
             </CardContent>

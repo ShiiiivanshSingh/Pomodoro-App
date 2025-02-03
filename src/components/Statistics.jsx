@@ -5,31 +5,17 @@ import { useStats } from '../hooks/useStats';
 import { formatTime } from '../utils/timeUtils';
 import { Stat } from './ui/stat';
 
-const Statistics = () => {
-  const stats = useStats();
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Today's Statistics</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 gap-4">
-          <Stat label="Focus Time" value={formatTime(stats.focusTime)} />
-          <Stat label="Break Time" value={formatTime(stats.breakTime)} />
-          <Stat label="Completed Sessions" value={stats.completedSessions} />
-          <Stat label="Completed Tasks" value={stats.completedTasks} />
-        </div>
-      </CardContent>
-
-      <CardHeader>
-        <CardTitle>All Time Stats</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {/* Add all time statistics here */}
-      </CardContent>
-    </Card>
-  );
-};
+const Statistics = ({ completedSessions, totalFocusTime }) => (
+  <div className="grid grid-cols-2 gap-4 mt-6">
+    <div className="text-center p-4 bg-opacity-20 rounded">
+      <div className="text-2xl font-bold">{completedSessions}</div>
+      <div className="text-sm">Sessions</div>
+    </div>
+    <div className="text-center p-4 bg-opacity-20 rounded">
+      <div className="text-2xl font-bold">{Math.floor(totalFocusTime / 60)}h</div>
+      <div className="text-sm">Focus Time</div>
+    </div>
+  </div>
+);
 
 export default Statistics; 
