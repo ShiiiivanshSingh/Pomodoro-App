@@ -2,7 +2,7 @@ import './App.css';
 import './index.css';
 
 import React, { useState, useEffect, memo } from 'react';
-import { Bell, Pause, Play, RotateCcw, Settings, Sun, Moon, Clock } from 'lucide-react';
+import { Bell, Pause, Play, RotateCcw, Settings, Sun, Moon, Clock, Info, ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Slider } from './components/ui/slider';
 import { Alert, AlertDescription } from './components/ui/alert';
@@ -63,6 +63,7 @@ const App = () => {
   const [notifications, setNotifications] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [completedSessions, setCompletedSessions] = useState(0);
+  const [showAbout, setShowAbout] = useState(false);
 
   // Move timer logic into a separate useEffect
   useEffect(() => {
@@ -198,6 +199,104 @@ const App = () => {
           isDaytime={!shouldShowNightBackground}
           isDarkMode={isDarkMode}
         />
+      ) : showAbout ? (
+        <div className={`min-h-screen relative ${theme}`}>
+          {shouldShowNightBackground ? <MemoizedNightBackground /> : <MemoizedDayBackground />}
+          <div className="container mx-auto px-4 py-8 relative z-10">
+            <button
+              onClick={() => setShowAbout(false)}
+              className={`mb-8 inline-flex items-center gap-2 px-4 py-2 rounded-lg backdrop-blur-lg ${
+                shouldShowNightBackground 
+                  ? 'bg-gray-900/90 text-gray-200 hover:bg-gray-800/90' 
+                  : 'bg-white/90 text-gray-800 hover:bg-gray-50/90'
+              }`}
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Focus
+            </button>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* About Card */}
+              <div className={`p-6 rounded-lg backdrop-blur-lg ${
+                shouldShowNightBackground ? 'bg-gray-900/90 text-gray-200' : 'bg-white/90 text-gray-800'
+              }`}>
+                <h2 className="text-xl font-bold mb-4">✨ About FocusBuddy</h2>
+                <p className="text-sm">Your friendly companion for productive focus sessions! Stay motivated with beautiful day/night themes and encouraging messages. 🌟</p>
+              </div>
+
+              {/* Features Card */}
+              <div className={`p-6 rounded-lg backdrop-blur-lg ${
+                shouldShowNightBackground ? 'bg-gray-900/90 text-gray-200' : 'bg-white/90 text-gray-800'
+              }`}>
+                <h2 className="text-xl font-bold mb-4"> Key Features</h2>
+                <ul className="text-sm space-y-2">
+                  <li>🌙 Smart Day/Night Theme</li>
+                  <li>⚡ Quick Keyboard Controls</li>
+                  <li>📊 Session Tracking</li>
+                  <li>💫 Beautiful Animations</li>
+                  <li>📱 Mobile Friendly</li>
+                </ul>
+              </div>
+
+              {/* Controls Card */}
+              <div className={`p-6 rounded-lg backdrop-blur-lg ${
+                shouldShowNightBackground ? 'bg-gray-900/90 text-gray-200' : 'bg-white/90 text-gray-800'
+              }`}>
+                <h2 className="text-xl font-bold mb-4">⌨️ Quick Controls</h2>
+                <div className="text-sm space-y-2 text-center">
+                  <p><code className={`px-2 py-1 rounded ${shouldShowNightBackground ? 'bg-gray-800 text-gray-200' : 'bg-gray-200 text-gray-800'}`}>Space</code> → Start/Pause</p>
+                  <p><code className={`px-2 py-1 rounded ${shouldShowNightBackground ? 'bg-gray-800 text-gray-200' : 'bg-gray-200 text-gray-800'}`}>R</code> → Reset Timer</p>
+                </div>
+              </div>
+
+              {/* Developer Card */}
+              <div className={`p-6 rounded-lg backdrop-blur-lg ${
+                shouldShowNightBackground ? 'bg-gray-900/90 text-gray-200' : 'bg-white/90 text-gray-800'
+              }`}>
+                <h2 className="text-xl font-bold mb-4">👋 Connect With Me</h2>
+                <div className="text-sm space-y-2">
+                  <a href="https://github.com/ShiiiivanshSingh" target="_blank" rel="noopener noreferrer" 
+                    className="block hover:underline">🐱 GitHub</a>
+                  <a href="https://www.linkedin.com/in/shivansh-pratap-singh-23b3b92b1" target="_blank" rel="noopener noreferrer"
+                    className="block hover:underline">💼 LinkedIn</a>
+                  <a href="https://x.com/de_mirage_fan" target="_blank" rel="noopener noreferrer"
+                    className="block hover:underline">🐦 Twitter</a>
+                </div>
+              </div>
+
+              {/* Repository Card */}
+              <div className={`p-6 rounded-lg backdrop-blur-lg ${
+                shouldShowNightBackground ? 'bg-gray-900/90 text-gray-200' : 'bg-white/90 text-gray-800'
+              }`}>
+                <h2 className="text-xl font-bold mb-4">📦 Open Source</h2>
+                <p className="text-sm mb-4">This project is open source! Feel free to contribute or star the repository.</p>
+                <a 
+                  href="https://github.com/ShiiiivanshSingh/FocusBuddy" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center px-4 py-2 rounded-lg text-sm ${
+                    shouldShowNightBackground 
+                      ? 'bg-gray-800 hover:bg-gray-700 text-gray-200' 
+                      : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+                  }`}
+                >
+                  🔗 View on GitHub
+                </a>
+              </div>
+
+              {/* Thank You Card */}
+              <div className={`p-6 rounded-lg backdrop-blur-lg ${
+                shouldShowNightBackground ? 'bg-gray-900/90 text-gray-200' : 'bg-white/90 text-gray-800'
+              }`}>
+                <h2 className="text-xl font-bold mb-4">💝 Thank You Note</h2>
+                <p className="text-sm">
+                  Thank you for using FocusBuddy! This project was created with love and care to help you stay focused and productive. 
+                  Your support means the world to me. Hope this little buddy helps you achieve your goals! 
+                  <span className="block mt-2">- Shivansh</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       ) : (
         <div className={`flex justify-center items-center min-h-screen relative ${theme}`}>
           {shouldShowNightBackground ? <MemoizedNightBackground /> : <MemoizedDayBackground />}
@@ -216,7 +315,7 @@ const App = () => {
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle className={shouldShowNightBackground ? 'text-gray-300' : 'text-gray-900'}>
-                  Pomodoro Timer
+                  FocusBuddy
                 </CardTitle>
                 <div className="flex gap-2">
                   <button
@@ -229,6 +328,15 @@ const App = () => {
                       <Moon className="h-5 w-5 text-blue-300" />
                     }
                   </button>
+                  <button
+                    onClick={() => setShowAbout(true)}
+                    className="p-2 rounded-full hover:bg-gray-800 dark:hover:bg-gray-100"
+                    aria-label="About FocusBuddy"
+                  >
+                    <Info className={`h-5 w-5 ${
+                      shouldShowNightBackground ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'
+                    }`} />
+                  </button>
                   <Dialog>
                     <DialogTrigger>
                       <Settings className={`h-5 w-5 ${shouldShowNightBackground ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'} cursor-pointer`} />
@@ -236,7 +344,7 @@ const App = () => {
                     <DialogContent className={shouldShowNightBackground ? 'bg-gray-800 border-gray-700' : 'bg-white'}>
                       <DialogHeader>
                         <DialogTitle className={shouldShowNightBackground ? 'text-gray-300' : 'text-gray-900'}>
-                          Timer Settings
+                          FocusBuddy Settings
                         </DialogTitle>
                       </DialogHeader>
                       <div className="space-y-6 py-4">
