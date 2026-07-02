@@ -1,7 +1,7 @@
 import './App.css';
 import './index.css';
 
-import React, { useState, useEffect, memo } from 'react';
+import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Bell, Pause, Play, RotateCcw, Settings, Sun, Moon, Clock, Info, ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Slider } from './components/ui/slider';
@@ -55,9 +55,7 @@ const App = () => {
   const [isBreak, setIsBreak] = useState(false);
   const [sessionDuration, setSessionDuration] = useState(25 * 60);
   const [breakDuration, setBreakDuration] = useState(5 * 60);
-  //const [showSettings, setShowSettings] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
-  const [isDaytime, setIsDaytime] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showLandingPage, setShowLandingPage] = useState(true);
   const [notifications, setNotifications] = useState(true);
@@ -65,31 +63,39 @@ const App = () => {
   const [completedSessions, setCompletedSessions] = useState(0);
   const [showAbout, setShowAbout] = useState(false);
 
-  // Move timer logic into a separate useEffect
+  // Keep the latest notifications preference in a ref so the timer can read it
+  // without re-subscribing every time the toggle flips.
+  const notificationsRef = useRef(notifications);
   useEffect(() => {
-    let interval = null;
-    if (isRunning) {
-      interval = setInterval(() => {
-        setTimeLeft((prevTime) => {
-          if (prevTime === 0) {
-            showAlert();
-            if (!isBreak) {
-              setCompletedSessions(prev => prev + 1);
-            }
-            if (isBreak) {
-              setIsBreak(false);
-              return sessionDuration;
-            } else {
-              setIsBreak(true);
-              return breakDuration;
-            }
+    notificationsRef.current = notifications;
+  }, [notifications]);
+
+  const showAlert = useCallback(() => {
+    if (!notificationsRef.current) return;
+    setShowNotification(true);
+    setTimeout(() => setShowNotification(false), 10000); // Show for 10 seconds
+  }, []);
+
+  // Countdown timer
+  useEffect(() => {
+    if (!isRunning) return undefined;
+    const interval = setInterval(() => {
+      setTimeLeft((prevTime) => {
+        // Transition to the next phase on the tick that reaches zero,
+        // so the alert fires exactly at 0 without displaying a stray extra second.
+        if (prevTime <= 1) {
+          showAlert();
+          if (!isBreak) {
+            setCompletedSessions((prev) => prev + 1);
           }
-          return prevTime - 1;
-        });
-      }, 1000);
-    }
+          setIsBreak((prev) => !prev);
+          return isBreak ? sessionDuration : breakDuration;
+        }
+        return prevTime - 1;
+      });
+    }, 1000);
     return () => clearInterval(interval);
-  }, [isRunning, isBreak, sessionDuration, breakDuration]);
+  }, [isRunning, isBreak, sessionDuration, breakDuration, showAlert]);
 
   // Add time check and update effect
   useEffect(() => {
@@ -107,22 +113,17 @@ const App = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const toggleTimer = () => setIsRunning(!isRunning);
-  const resetTimer = () => {
+  const toggleTimer = useCallback(() => setIsRunning((prev) => !prev), []);
+  const resetTimer = useCallback(() => {
     setIsRunning(false);
     setIsBreak(false);
     setTimeLeft(sessionDuration);
-  };
+  }, [sessionDuration]);
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${minutes}:${secs < 10 ? '0' + secs : secs}`;
-  };
-
-  const showAlert = () => {
-    setShowNotification(true);
-    setTimeout(() => setShowNotification(false), 10000); // Show for 10 seconds
   };
 
   const updateSessionDuration = (newValue) => {
@@ -138,8 +139,7 @@ const App = () => {
   };
 
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    setIsDaytime(!isDaytime);
+    setIsDarkMode((prev) => !prev);
   };
 
   // Modify the theme logic to use only isDarkMode

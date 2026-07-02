@@ -56,11 +56,4 @@ const LandingPage = ({ onStart, isDaytime, isDarkMode }) => {
   );
 };
 
-const FeatureCard = ({ title, description }) => (
-  <div className="p-6 rounded-lg bg-white/10 backdrop-blur-lg">
-    <h3 className="text-xl font-semibold mb-2">{title}</h3>
-    <p className="text-gray-600 dark:text-gray-300">{description}</p>
-  </div>
-);
-
-export default LandingPage; 
+export default LandingPage;
